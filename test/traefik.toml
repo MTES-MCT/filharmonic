@@ -1,0 +1,20 @@
+[file]
+  [backends]
+    [backends.ui]
+      [backends.ui.servers.server0]
+        url = "http://ui:5000"
+    [backends.api]
+      [backends.api.servers.server0]
+        url = "http://api:5000"
+
+  [frontends]
+    [frontends.ui]
+      backend = "ui"
+      [frontends.ui.routes]
+        [frontends.ui.routes.route0]
+          rule = "PathPrefixStrip:/"
+    [frontends.api]
+      backend = "api"
+      [frontends.api.routes]
+        [frontends.api.routes.route0]
+          rule = "PathPrefixStrip:/api"

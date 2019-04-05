@@ -1,0 +1,42 @@
+version: '3.5'
+
+services:
+  traefik:
+    image: traefik:1.7.7
+    restart: unless-stopped
+    ports:
+      - 5000:80
+    volumes:
+      - ./traefik.toml:/traefik.toml:ro
+
+  ui:
+    image: betagouv/filharmonic-ui:latest
+    restart: unless-stopped
+
+  api:
+    image: betagouv/filharmonic-api:latest
+    restart: unless-stopped
+    depends_on:
+      - postgresql
+      - minio
+    environment:
+      - "FILHARMONIC_DATABASE_HOST=postgresql"
+      - "FILHARMONIC_DATABASE_PASSWORD=filharmonic_password"
+      - "FILHARMONIC_STORAGE_ENDPOINT=minio:9000"
+      - "FILHARMONIC_MODE=test"
+
+  postgresql:
+    image: postgres:11.1-alpine
+    restart: unless-stopped
+    environment:
+      - "POSTGRES_USER=filharmonic"
+      - "POSTGRES_PASSWORD=filharmonic_password"
+      - "POSTGRES_DB=filharmonic"
+
+  minio:
+    image: minio/minio:RELEASE.2019-01-23T23-18-58Z
+    restart: unless-stopped
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: filharmonic
+      MINIO_SECRET_KEY: filharmonic
